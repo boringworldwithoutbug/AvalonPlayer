@@ -1,10 +1,15 @@
 package com.avalon.avalonplayer.ui.activity;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,6 +34,12 @@ public class MainActivity extends BaseActivity {
     ActivityMainBinding mBinding;
     MainActivityData data;
     RealmAsyncTask tracsaction;
+    List<MusicInfo> musicInfos;
+
+    // 所需的全部权限
+    static final String[] PERMISSIONS = new String[]{
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +51,40 @@ public class MainActivity extends BaseActivity {
         data = new MainActivityData();
         mBinding.setMain(data);
         mBinding.setClick(new MainClick());
+        musicInfos = new ArrayList<>();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 102:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    searchMusic();
+                } else {
+                    finish();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void startPermissionsActivity() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},102);
+        }
+    }
+
+    private void searchMusic(){
+        if (musicInfos.size() == 0){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    musicInfos = getMp3Infos(MainActivity.this);
+                }
+            }).start();
+        }
     }
 
     public class MainClick {
@@ -48,6 +93,12 @@ public class MainActivity extends BaseActivity {
             doNetWork();
         }
         public void onImport() {
+            // 缺少权限时, 进入权限配置页面
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                startPermissionsActivity();
+            } else {
+                searchMusic();
+            }
             tracsaction = realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -73,7 +124,7 @@ public class MainActivity extends BaseActivity {
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null,
                 MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        List<MusicInfo> mp3Infos = new ArrayList<MusicInfo>();
+        List<MusicInfo> mp3Infos = new ArrayList<>();
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToNext();
             MusicInfo mp3Info = new MusicInfo();
@@ -81,6 +132,7 @@ public class MainActivity extends BaseActivity {
                     .getColumnIndex(MediaStore.Audio.Media._ID));               //音乐id
             String title = cursor.getString((cursor
                     .getColumnIndex(MediaStore.Audio.Media.TITLE)));            //音乐标题
+            Log.d("第"+i+"首歌",title);
             String artist = cursor.getString(cursor
                     .getColumnIndex(MediaStore.Audio.Media.ARTIST));            //艺术家
             long duration = cursor.getLong(cursor

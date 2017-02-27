@@ -14,6 +14,7 @@ import com.avalon.avalonplayer.conponent.MainComponent;
 import com.avalon.avalonplayer.data.Person;
 import com.avalon.avalonplayer.module.MainModule;
 import com.avalon.avalonplayer.net.NetClient;
+import com.avalon.avalonplayer.utils.PermissionChecker;
 
 import javax.inject.Inject;
 
@@ -32,13 +33,15 @@ public class BaseActivity extends AppCompatActivity {
     Person person;
     @Inject
     NetClient netClient;
-    @Inject
+
+//    @Inject
     Realm realm;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injectPerson();
+        realm = Realm.getDefaultInstance();
     }
 
     @Override

@@ -1,7 +1,10 @@
 package com.avalon.avalonplayer.module;
 
+import android.content.Context;
+
 import com.avalon.avalonplayer.data.Person;
 import com.avalon.avalonplayer.net.NetClient;
+import com.avalon.avalonplayer.utils.PermissionChecker;
 
 import dagger.Module;
 import dagger.Provides;
@@ -22,8 +25,8 @@ public class MainModule {
         return new NetClient();
     }
 
-    @Provides
-    Realm providerRealm() {
-        return Realm.getDefaultInstance();
-    }
+//    @Provides
+//    Realm providerRealm() {
+//        return Realm.getDefaultInstance();
+//    }
 }

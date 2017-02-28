@@ -37,4 +37,24 @@ public class MusicInfo extends RealmObject {
     }
 
     private String url;
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    private long time;
+
+    private long size;
 }

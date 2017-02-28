@@ -11,7 +11,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.avalon.avalonplayer.R;
 import com.avalon.avalonplayer.data.MainActivityData;
@@ -26,7 +25,6 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 
 public class MainActivity extends BaseActivity {
@@ -35,11 +33,6 @@ public class MainActivity extends BaseActivity {
     MainActivityData data;
     RealmAsyncTask tracsaction;
     List<MusicInfo> musicInfos;
-
-    // 所需的全部权限
-    static final String[] PERMISSIONS = new String[]{
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +43,9 @@ public class MainActivity extends BaseActivity {
 
         data = new MainActivityData();
         mBinding.setMain(data);
+
         mBinding.setClick(new MainClick());
         musicInfos = new ArrayList<>();
-
     }
 
     @Override
@@ -77,14 +70,25 @@ public class MainActivity extends BaseActivity {
     }
 
     private void searchMusic(){
-        if (musicInfos.size() == 0){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    musicInfos = getMp3Infos(MainActivity.this);
-                }
-            }).start();
-        }
+//        if (musicInfos.size() == 0){
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    musicInfos = getMp3Infos(MainActivity.this);
+//                }
+//            }).start();
+//        }
+        dbCLient.getMusicList(getApplicationContext())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<MusicInfo>>() {
+                    @Override
+                    public void accept(List<MusicInfo> list) throws Exception {
+                        for (MusicInfo m : list){
+                            Log.i("wqq",m.getSongName());
+                        }
+                    }
+                });
     }
 
     public class MainClick {
@@ -99,24 +103,27 @@ public class MainActivity extends BaseActivity {
             } else {
                 searchMusic();
             }
-            tracsaction = realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    MusicInfo m = realm.createObject(MusicInfo.class);
-                    m.setSongName("幻想万华镜");
-                    m.setSingerName("蛤蛤、");
-                }
-            }, new Realm.Transaction.OnSuccess() {
-                @Override
-                public void onSuccess() {
-                    Toast.makeText(MainActivity.this, "插入成功", Toast.LENGTH_SHORT).show();
-                }
-            }, new Realm.Transaction.OnError() {
-                @Override
-                public void onError(Throwable error) {
-                    Toast.makeText(MainActivity.this, "插入失败", Toast.LENGTH_SHORT).show();
-                }
-            });
+//            if (getDao().insert(musicInfos)){
+//                showToast(getResources().getString(R.string.save_succ));
+//            }
+//            tracsaction = realm.executeTransactionAsync(new Realm.Transaction() {
+//                @Override
+//                public void execute(Realm realm) {
+//                    MusicInfo m = realm.createObject(MusicInfo.class);
+//                    m.setSongName("幻想万华镜");
+//                    m.setSingerName("蛤蛤、");
+//                }
+//            }, new Realm.Transaction.OnSuccess() {
+//                @Override
+//                public void onSuccess() {
+//                    Toast.makeText(MainActivity.this, "插入成功", Toast.LENGTH_SHORT).show();
+//                }
+//            }, new Realm.Transaction.OnError() {
+//                @Override
+//                public void onError(Throwable error) {
+//                    Toast.makeText(MainActivity.this, "插入失败", Toast.LENGTH_SHORT).show();
+//                }
+//            });
         }
     }
 
@@ -147,10 +154,16 @@ public class MainActivity extends BaseActivity {
                 mp3Info.setSongName(title);
                 mp3Info.setSingerName(artist);
                 mp3Info.setUrl(url);
+                mp3Info.setSize(size);
+                mp3Info.setTime(duration);
                 mp3Infos.add(mp3Info);
             }
         }
         return mp3Infos;
+    }
+
+    public void getMusics(){
+
     }
 
     private void doNetWork() {

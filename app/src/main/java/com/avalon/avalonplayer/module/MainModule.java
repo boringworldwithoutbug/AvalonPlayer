@@ -3,6 +3,7 @@ package com.avalon.avalonplayer.module;
 import android.content.Context;
 
 import com.avalon.avalonplayer.data.Person;
+import com.avalon.avalonplayer.db.DbCLient;
 import com.avalon.avalonplayer.net.NetClient;
 import com.avalon.avalonplayer.utils.PermissionChecker;
 
@@ -23,6 +24,11 @@ public class MainModule {
     @Provides
     NetClient providerNetClient() {
         return new NetClient();
+    }
+
+    @Provides
+    DbCLient providerDvClient() {
+        return new DbCLient();
     }
 
 //    @Provides

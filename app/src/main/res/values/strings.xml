@@ -7,6 +7,7 @@
     <string name="title_activity_scrolling">ScrollingActivity</string>
 
     <string name="import_music">import music</string>
+    <string name="save_succ">save success!</string>
 
     <string name="large_text">
         "Material is the metaphor.\n\n"

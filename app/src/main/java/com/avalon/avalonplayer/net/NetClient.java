@@ -27,7 +27,7 @@ public class NetClient {
 
     GithubService githubService;
 
-    public Retrofit getRetrofit(){
+    private Retrofit getRetrofit(){
         if (retrofit == null){
             retrofit = new Retrofit.Builder()
                     .client(new OkHttpClient())
@@ -39,7 +39,7 @@ public class NetClient {
         return retrofit;
     }
 
-    public GithubService getGithubService(){
+    private GithubService getGithubService(){
         if (githubService == null){
             githubService = getRetrofit().create(GithubService.class);
         }
@@ -55,12 +55,12 @@ public class NetClient {
         return getGithubObserable(TestData.class,param);
     }
 
-    public <T> Observable<T> getGithubObserable(Type mType,Hashtable<String, String> hashtable) {
+    private <T> Observable<T> getGithubObserable(Type mType,Hashtable<String, String> hashtable) {
         return Observable.create(new BaseObservable<T>(mType,getGettData(hashtable)));
     }
 
 
-    public Observable<String> getGettData(Hashtable<String, String> hashtable) {
+    private Observable<String> getGettData(Hashtable<String, String> hashtable) {
         if (hashtable == null)
             hashtable = new Hashtable<>();
         String data = getData(hashtable);

@@ -64,12 +64,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void startPermissionsActivity() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},102);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 102);
         }
     }
 
-    private void searchMusic(){
+    private void searchMusic() {
 //        if (musicInfos.size() == 0){
 //            new Thread(new Runnable() {
 //                @Override
@@ -84,8 +84,8 @@ public class MainActivity extends BaseActivity {
                 .subscribe(new Consumer<List<MusicInfo>>() {
                     @Override
                     public void accept(List<MusicInfo> list) throws Exception {
-                        for (MusicInfo m : list){
-                            Log.i("wqq",m.getSongName());
+                        if (getDao().insert(list)) {
+                            showToast(getResources().getString(R.string.save_succ));
                         }
                     }
                 });
@@ -96,6 +96,7 @@ public class MainActivity extends BaseActivity {
             startActivity(GuideUtils.getMusicListActivity(MainActivity.this));
             doNetWork();
         }
+
         public void onImport() {
             // 缺少权限时, 进入权限配置页面
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -139,7 +140,7 @@ public class MainActivity extends BaseActivity {
                     .getColumnIndex(MediaStore.Audio.Media._ID));               //音乐id
             String title = cursor.getString((cursor
                     .getColumnIndex(MediaStore.Audio.Media.TITLE)));            //音乐标题
-            Log.d("第"+i+"首歌",title);
+            Log.d("第" + i + "首歌", title);
             String artist = cursor.getString(cursor
                     .getColumnIndex(MediaStore.Audio.Media.ARTIST));            //艺术家
             long duration = cursor.getLong(cursor
@@ -162,7 +163,7 @@ public class MainActivity extends BaseActivity {
         return mp3Infos;
     }
 
-    public void getMusics(){
+    public void getMusics() {
 
     }
 

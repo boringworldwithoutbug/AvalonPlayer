@@ -27,6 +27,12 @@
             android:name=".ui.activity.MusicListActivity"
             android:label="@string/musiclist_title"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.activity.MusicDetailsActivity"
+            android:label="@string/musicdetail"
+            android:screenOrientation="portrait"/>
+
+        <service android:name=".service.PlayService"
+            android:exported="false"/>
     </application>
 
 </manifest>

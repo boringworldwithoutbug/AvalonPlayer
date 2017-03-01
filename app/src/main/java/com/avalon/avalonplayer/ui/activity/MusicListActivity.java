@@ -1,6 +1,8 @@
 package com.avalon.avalonplayer.ui.activity;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
@@ -14,9 +16,11 @@ import android.view.ViewGroup;
 
 import com.avalon.avalonplayer.BR;
 import com.avalon.avalonplayer.R;
+import com.avalon.avalonplayer.callback.RecyclerViewItemOnClickListener;
 import com.avalon.avalonplayer.data.MusicItemData;
 import com.avalon.avalonplayer.databinding.ActivityMusiclistBinding;
 import com.avalon.avalonplayer.db.MusicInfo;
+import com.avalon.avalonplayer.service.PlayService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,30 +43,46 @@ public class MusicListActivity extends BaseActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_musiclist);
         setTitle(getResources().getString(R.string.musiclist_title));
         musicItemDatas = new ArrayList<>();
-        mAdapter = new MusicListAdapter(this,musicItemDatas);
+        mAdapter = new MusicListAdapter(this,musicItemDatas,listener);
         mBinding.rvMusicList.setLayoutManager(new LinearLayoutManager(this));
         mBinding.rvMusicList.setAdapter(mAdapter);
         getMusicList();
     }
 
+    RecyclerViewItemOnClickListener listener = new RecyclerViewItemOnClickListener() {
+        @Override
+        public void onClick(int position) {
+            showToast(musicItemDatas.get(position).getUrl());
+            Intent intent = new Intent(MusicListActivity.this, PlayService.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("music_url",musicItemDatas.get(position).getUrl());
+            intent.putExtras(bundle);
+            startService(intent);
+        }
+    };
+
     private void getMusicList() {
         RealmResults<MusicInfo> realmResults = realm.where(MusicInfo.class).findAll();
         for (MusicInfo m : realmResults) {
             Log.d("wqq", m.getSongName() + " " + m.getSingerName());
-            musicItemDatas.add(new MusicItemData(m.getSongName(), m.getSingerName()));
+            MusicItemData data = new MusicItemData(m.getSongName(), m.getSingerName());
+            data.setUrl(m.getUrl());
+            musicItemDatas.add(data);
         }
         mAdapter.notifyDataSetChanged();
     }
 
     class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.ViewHolder> {
 
-        public MusicListAdapter(Context context, List<MusicItemData> list) {
+        public MusicListAdapter(Context context, List<MusicItemData> list,RecyclerViewItemOnClickListener listener) {
             this.context = context;
             this.list = list;
+            this.mListener = listener;
         }
 
         private Context context;
         private List<MusicItemData> list;
+        private RecyclerViewItemOnClickListener mListener;
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -73,9 +93,15 @@ public class MusicListActivity extends BaseActivity {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder holder, final int position) {
             holder.getBinding().setVariable(BR.music, list.get(position));
             holder.getBinding().executePendingBindings();
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onClick(position);
+                }
+            });
         }
 
         @Override

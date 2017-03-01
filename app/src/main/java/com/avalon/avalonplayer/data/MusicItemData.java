@@ -17,6 +17,16 @@ public class MusicItemData extends BaseObservable{
     private String song;
     private String singer;
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    private String url;
+
     @Bindable
     public String getSong() {
         return song;

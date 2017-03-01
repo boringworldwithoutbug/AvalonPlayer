@@ -3,6 +3,7 @@
 
     <string name="main_title">AvalonPlayer</string>
     <string name="musiclist_title">MusicList</string>
+    <string name="musicdetail">MusicDetails</string>
     <string name="hello_world">helloworld!</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
 

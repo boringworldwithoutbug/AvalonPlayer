@@ -17,6 +17,7 @@ public class PlayService extends Service {
     //current url
     String url;
     MediaPlayerUtils utils;
+    SeekBinder binder;
 
     @Override
     public void onCreate() {
@@ -34,7 +35,10 @@ public class PlayService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return new SeekBinder();
+        if (binder == null){
+            binder = new SeekBinder();
+        }
+        return binder;
     }
 
     @Override
@@ -46,6 +50,12 @@ public class PlayService extends Service {
     public class SeekBinder extends Binder{
         public int getCurrentPosition(){
             return utils.getCurrentPosition();
+        }
+        public int getMaxSize() {
+            return utils.getSongTime();
+        }
+        public boolean getPlayerState() {
+            return utils.isPlayer();
         }
     }
 }

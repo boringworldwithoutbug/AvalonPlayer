@@ -27,6 +27,7 @@ public class MediaPlayerUtils {
 
     public void play (String url) {
         try {
+            getPlayer().reset();
             getPlayer().setDataSource(url);
             getPlayer().prepare();
             getPlayer().start();
@@ -44,9 +45,14 @@ public class MediaPlayerUtils {
     }
 
     public int getCurrentPosition(){
-        return getPlayer().getCurrentPosition();
+        return isPlayer()?getPlayer().getCurrentPosition():0;
     }
-
+    public int getSongTime(){
+        return isPlayer()?getPlayer().getDuration():100;
+    }
+    public boolean isPlayer() {
+        return getPlayer().isPlaying();
+    }
     public void destroy() {
         if (mediaPlayer != null){
             mediaPlayer.release();

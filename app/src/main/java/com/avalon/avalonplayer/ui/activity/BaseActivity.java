@@ -18,7 +18,6 @@ import com.avalon.avalonplayer.db.DbCLient;
 import com.avalon.avalonplayer.db.RealmBaseDao;
 import com.avalon.avalonplayer.module.MainModule;
 import com.avalon.avalonplayer.net.NetClient;
-import com.avalon.avalonplayer.utils.PermissionChecker;
 
 import javax.inject.Inject;
 

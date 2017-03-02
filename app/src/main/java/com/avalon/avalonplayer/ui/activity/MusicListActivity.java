@@ -1,8 +1,6 @@
 package com.avalon.avalonplayer.ui.activity;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
@@ -20,7 +18,7 @@ import com.avalon.avalonplayer.callback.RecyclerViewItemOnClickListener;
 import com.avalon.avalonplayer.data.MusicItemData;
 import com.avalon.avalonplayer.databinding.ActivityMusiclistBinding;
 import com.avalon.avalonplayer.db.MusicInfo;
-import com.avalon.avalonplayer.service.PlayService;
+import com.avalon.avalonplayer.utils.GuideUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +51,8 @@ public class MusicListActivity extends BaseActivity {
         @Override
         public void onClick(int position) {
             showToast(musicItemDatas.get(position).getUrl());
-            Intent intent = new Intent(MusicListActivity.this, PlayService.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("music_url",musicItemDatas.get(position).getUrl());
-            intent.putExtras(bundle);
-            startService(intent);
+            MusicItemData data = musicItemDatas.get(position);
+            startActivity(GuideUtils.getMusicDetailsActivity(MusicListActivity.this,data.getSong(),data.getSinger(),data.getUrl()));
         }
     };
 

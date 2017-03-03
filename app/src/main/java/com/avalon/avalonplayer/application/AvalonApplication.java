@@ -21,6 +21,9 @@ public class AvalonApplication extends Application {
 
     private String realmName = "avalon.realm";
 
+    //-1 停止 0 正在播放 1暂停
+    public int playState = -1;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -52,5 +55,13 @@ public class AvalonApplication extends Application {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+    }
+
+    public int getPlayState() {
+        return playState;
+    }
+
+    public void setPlayState(int playState) {
+        this.playState = playState;
     }
 }

@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.widget.SeekBar;
 
 import com.avalon.avalonplayer.R;
+import com.avalon.avalonplayer.application.AvalonApplication;
 import com.avalon.avalonplayer.data.MusicDetailData;
 import com.avalon.avalonplayer.databinding.ActivityMusicdetailsBinding;
 import com.avalon.avalonplayer.service.PlayService;
@@ -29,11 +30,14 @@ public class MusicDetailsActivity extends BaseActivity {
     String singerName;
     String songUrl;
 
-    Intent intent;
-
     public final static String SONG_NAME = "songName";
     public final static String SINGEL_NAME = "singerName";
     public final static String SONG_URL = "songUrl";
+
+    public final static String PLAY = "com.avalon.avalonplayer.PLAY";
+    public final static String PAUSE = "com.avalon.avalonplayer.PAUSE";
+    public final static String STOP = "com.avalon.avalonplayer.STOP";
+    public final static String RESET = "com.avalon.avalonplayer.RESET";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,16 +47,14 @@ public class MusicDetailsActivity extends BaseActivity {
         setTitle(songName);
         mBinding.setData(new MusicDetailData());
         mBinding.setClick(new MusicDetailsOnClick());
-        intent = new Intent(this,PlayService.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("music_url",songUrl);
-        intent.putExtras(bundle);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        bindService();
+        if (AvalonApplication.getInstance().getPlayState() != -1){
+            bindService();
+        }
     }
 
     private void initBundle() {
@@ -61,9 +63,30 @@ public class MusicDetailsActivity extends BaseActivity {
         songUrl = getIntent().getExtras().getString(SONG_URL,"");
     }
 
-    private void play(){
+    private void play() {
+        Intent intent = new Intent();
+        intent.setAction(PLAY);
+        intent.putExtra(SONG_URL, songUrl);
+        sendBroadcast(intent);
         bindService();
-        startService(intent);
+    }
+
+    private void pause() {
+        Intent intent = new Intent();
+        intent.setAction(PAUSE);
+        sendBroadcast(intent);
+    }
+
+    private void stopMusic() {
+        Intent intent = new Intent();
+        intent.setAction(STOP);
+        sendBroadcast(intent);
+    }
+
+    private void reset() {
+        Intent intent = new Intent();
+        intent.setAction(RESET);
+        sendBroadcast(intent);
     }
 
     private void bindService() {
@@ -94,20 +117,29 @@ public class MusicDetailsActivity extends BaseActivity {
 
                 }
             };
+            Intent intent = new Intent(MusicDetailsActivity.this,PlayService.class);
             bindService(intent, connection, Context.BIND_AUTO_CREATE);
         }
     }
 
     public class MusicDetailsOnClick {
         public void playOrPause(){
-            play();
+            int state = AvalonApplication.getInstance().getPlayState();
+            if (state == 1){
+                reset();
+            } else if (state == -1){
+                play();
+            } else {
+                pause();
+            }
+        }
+        public void stop() {
+            stopMusic();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (connection != null)
-            connection = null;
     }
 }

@@ -1,6 +1,7 @@
 package com.avalon.avalonplayer.ui.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
@@ -14,6 +15,7 @@ import com.avalon.avalonplayer.data.MainActivityData;
 import com.avalon.avalonplayer.data.TestData;
 import com.avalon.avalonplayer.databinding.ActivityMainBinding;
 import com.avalon.avalonplayer.db.MusicInfo;
+import com.avalon.avalonplayer.service.PlayService;
 import com.avalon.avalonplayer.utils.GuideUtils;
 
 import java.util.ArrayList;
@@ -41,6 +43,9 @@ public class MainActivity extends BaseActivity {
 
         mBinding.setClick(new MainClick());
         musicInfos = new ArrayList<>();
+
+        Intent intent = new Intent(this,PlayService.class);
+        startService(intent);
     }
 
     @Override

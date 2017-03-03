@@ -44,6 +44,10 @@ public class MediaPlayerUtils {
         getPlayer().stop();
     }
 
+    public void reset() {
+        getPlayer().start();
+    }
+
     public int getCurrentPosition(){
         return isPlayer()?getPlayer().getCurrentPosition():0;
     }

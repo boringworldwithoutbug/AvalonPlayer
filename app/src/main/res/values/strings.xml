@@ -9,6 +9,7 @@
 
     <string name="import_music">import music</string>
     <string name="save_succ">save success!</string>
+    <string name="stop_music">stop</string>
 
     <string name="large_text">
         "Material is the metaphor.\n\n"

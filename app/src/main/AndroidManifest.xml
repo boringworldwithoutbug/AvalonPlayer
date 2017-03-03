@@ -33,6 +33,7 @@
 
         <service android:name=".service.PlayService"
             android:exported="false"/>
+
     </application>
 
 </manifest>

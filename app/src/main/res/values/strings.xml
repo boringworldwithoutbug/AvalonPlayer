@@ -10,6 +10,11 @@
     <string name="import_music">import music</string>
     <string name="save_succ">save success!</string>
     <string name="stop_music">stop</string>
+    <string name="play_music">play</string>
+    <string name="pause_music">pause</string>
+    <string name="next_music">next</string>
+    <string name="last_music">last</string>
+    <string name="add_playlist">add list</string>
 
     <string name="large_text">
         "Material is the metaphor.\n\n"

@@ -1,7 +1,6 @@
 package com.avalon.avalonplayer.ui.activity;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
@@ -11,11 +10,12 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.avalon.avalonplayer.R;
+import com.avalon.avalonplayer.application.AvalonApplication;
 import com.avalon.avalonplayer.data.MainActivityData;
+import com.avalon.avalonplayer.data.MusicItemData;
 import com.avalon.avalonplayer.data.TestData;
 import com.avalon.avalonplayer.databinding.ActivityMainBinding;
 import com.avalon.avalonplayer.db.MusicInfo;
-import com.avalon.avalonplayer.service.PlayService;
 import com.avalon.avalonplayer.utils.GuideUtils;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class MainActivity extends BaseActivity {
 
     ActivityMainBinding mBinding;
     MainActivityData data;
-    List<MusicInfo> musicInfos;
+    List<MusicItemData> mList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +40,9 @@ public class MainActivity extends BaseActivity {
 
         data = new MainActivityData();
         mBinding.setMain(data);
-
         mBinding.setClick(new MainClick());
-        musicInfos = new ArrayList<>();
 
-        Intent intent = new Intent(this,PlayService.class);
-        startService(intent);
+        mList = new ArrayList<>();
     }
 
     @Override
@@ -78,6 +75,11 @@ public class MainActivity extends BaseActivity {
                     public void accept(List<MusicInfo> list) throws Exception {
                         if (getDao().insert(list)) {
                             showToast(getResources().getString(R.string.save_succ));
+                            for (MusicInfo m : list){
+                                MusicItemData data = new MusicItemData(m.getSongName(),m.getSingerName());
+                                data.setUrl(m.getUrl());
+                                mList.add(data);
+                            }
                         }
                     }
                 });
@@ -96,6 +98,11 @@ public class MainActivity extends BaseActivity {
             } else {
                 searchMusic();
             }
+        }
+
+        public void onPlaylIST() {
+            AvalonApplication.getInstance().setCurrentPlayIndex(0);
+            AvalonApplication.getInstance().setCurrentPlayList(mList);
         }
     }
 

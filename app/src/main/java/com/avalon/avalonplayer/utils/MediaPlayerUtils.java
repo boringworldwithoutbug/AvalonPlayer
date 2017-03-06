@@ -48,6 +48,10 @@ public class MediaPlayerUtils {
         getPlayer().start();
     }
 
+    public void seekTo(int position) {
+
+    }
+
     public int getCurrentPosition(){
         return isPlayer()?getPlayer().getCurrentPosition():0;
     }
@@ -63,5 +67,4 @@ public class MediaPlayerUtils {
             mediaPlayer = null;
         }
     }
-
 }

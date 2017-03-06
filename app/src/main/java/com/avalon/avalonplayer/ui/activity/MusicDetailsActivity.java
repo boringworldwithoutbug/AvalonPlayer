@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
-import android.media.AsyncPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -29,15 +28,21 @@ public class MusicDetailsActivity extends BaseActivity {
     String songName;
     String singerName;
     String songUrl;
+    int index = -1;
 
     public final static String SONG_NAME = "songName";
     public final static String SINGEL_NAME = "singerName";
     public final static String SONG_URL = "songUrl";
+    public final static String LIST_INDEX = "listIndex";
+    public final static String SEEK_POSITION = "seekPosition";
 
     public final static String PLAY = "com.avalon.avalonplayer.PLAY";
     public final static String PAUSE = "com.avalon.avalonplayer.PAUSE";
     public final static String STOP = "com.avalon.avalonplayer.STOP";
     public final static String RESET = "com.avalon.avalonplayer.RESET";
+    public final static String NEXT = "com.avalon.avalonplayer.NEXT";
+    public final static String LAST = "com.avalon.avalonplayer.LAST";
+    public final static String SEEK = "com.avalon.avalonplayer.SEEK";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,21 +57,38 @@ public class MusicDetailsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (AvalonApplication.getInstance().getPlayState() != -1){
+        if (AvalonApplication.getInstance().getPlayState() != -1) {
             bindService();
+            mBinding.sbMusicProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    seekTo(progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
         }
     }
 
     private void initBundle() {
-        songName = getIntent().getExtras().getString(SONG_NAME,"");
-        singerName = getIntent().getExtras().getString(SINGEL_NAME,"");
-        songUrl = getIntent().getExtras().getString(SONG_URL,"");
+        songName = getIntent().getExtras().getString(SONG_NAME, "");
+        singerName = getIntent().getExtras().getString(SINGEL_NAME, "");
+        songUrl = getIntent().getExtras().getString(SONG_URL, "");
+        index = getIntent().getExtras().getInt(LIST_INDEX, 0);
     }
 
     private void play() {
         Intent intent = new Intent();
         intent.setAction(PLAY);
-        intent.putExtra(SONG_URL, songUrl);
+        intent.putExtra(LIST_INDEX, index);
         sendBroadcast(intent);
         bindService();
     }
@@ -89,8 +111,33 @@ public class MusicDetailsActivity extends BaseActivity {
         sendBroadcast(intent);
     }
 
+    private void nextMusic() {
+        Intent intent = new Intent();
+        index = index < AvalonApplication.getInstance().getCurrentPlayList().size() - 1 ? index + 1 : 0;
+        AvalonApplication.getInstance().setCurrentPlayIndex(index);
+        intent.setAction(NEXT);
+        intent.putExtra(LIST_INDEX, index);
+        sendBroadcast(intent);
+    }
+
+    private void lastMusic() {
+        Intent intent = new Intent();
+        index = index > 0 ? index - 1 : AvalonApplication.getInstance().getCurrentPlayList().size() - 1;
+        AvalonApplication.getInstance().setCurrentPlayIndex(index);
+        intent.setAction(LAST);
+        intent.putExtra(LIST_INDEX, index);
+        sendBroadcast(intent);
+    }
+
+    private void seekTo(int position) {
+        Intent intent = new Intent();
+        intent.setAction(SEEK);
+        intent.putExtra(SEEK_POSITION,position);
+        sendBroadcast(intent);
+    }
+
     private void bindService() {
-        if (connection == null){
+        if (connection == null) {
             connection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder service) {
@@ -100,7 +147,7 @@ public class MusicDetailsActivity extends BaseActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            while(binder.getPlayerState()){
+                            while (binder.getPlayerState()) {
                                 mBinding.sbMusicProgress.setProgress(binder.getCurrentPosition());
                                 try {
                                     Thread.sleep(500);
@@ -117,29 +164,39 @@ public class MusicDetailsActivity extends BaseActivity {
 
                 }
             };
-            Intent intent = new Intent(MusicDetailsActivity.this,PlayService.class);
+            Intent intent = new Intent(MusicDetailsActivity.this, PlayService.class);
             bindService(intent, connection, Context.BIND_AUTO_CREATE);
         }
     }
 
     public class MusicDetailsOnClick {
-        public void playOrPause(){
+        public void playOrPause() {
             int state = AvalonApplication.getInstance().getPlayState();
-            if (state == 1){
+            if (state == 1) {
                 reset();
-            } else if (state == -1){
+            } else if (state == -1) {
                 play();
             } else {
                 pause();
             }
         }
+
         public void stop() {
             stopMusic();
+        }
+
+        public void next() {
+            nextMusic();
+        }
+
+        public void last() {
+            lastMusic();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unbindService(connection);
     }
 }

@@ -47,6 +47,33 @@
                 android:layout_height="wrap_content"
                 android:onClick="@{()->click.playOrPause()}"
                 android:background="@mipmap/ic_launcher"/>
+
+            <TextView
+                android:id="@+id/tv_next"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@id/img_play_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:padding="5dp"
+                android:onClick="@{()->click.next()}"
+                android:text="@string/next_music"/>
+
+            <TextView
+                android:id="@+id/tv_last"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_toLeftOf="@id/img_play_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:padding="5dp"
+                android:onClick="@{()->click.last()}"
+                android:text="@string/last_music"/>
+
             <TextView
                 android:id="@+id/tv_stop"
                 android:layout_marginLeft="16dp"

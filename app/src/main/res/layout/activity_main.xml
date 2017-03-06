@@ -34,6 +34,15 @@
             android:textColor="@color/colorPrimaryDark"
             android:onClick="@{()->click.onImport()}"/>
 
+        <TextView
+            android:id="@+id/tv_add_playlist"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_playlist"
+            android:textColor="@color/black"
+            android:onClick="@{()->click.onPlaylIST()}"/>
+
     </LinearLayout>
 </layout>
 

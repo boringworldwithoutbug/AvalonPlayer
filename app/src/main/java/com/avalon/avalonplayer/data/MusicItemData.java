@@ -3,11 +3,13 @@ package com.avalon.avalonplayer.data;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
+import java.io.Serializable;
+
 /**
  * Created by wuqiuqiang on 2017/2/6.
  */
 
-public class MusicItemData extends BaseObservable{
+public class MusicItemData extends BaseObservable implements Serializable{
 
     public MusicItemData(String song, String singer) {
         this.song = song;

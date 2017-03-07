@@ -28,13 +28,12 @@ public class GuideUtils {
         return intent;
     }
 
-    public static Intent getMusicDetailsActivity(Context context,String songName,String singerName,String songUrl,int index) {
+    public static Intent getMusicDetailsActivity(Context context,String songName,String singerName,String songUrl) {
         Intent intent = new Intent(context, MusicDetailsActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(MusicDetailsActivity.SONG_NAME,songName);
         bundle.putString(MusicDetailsActivity.SINGEL_NAME,singerName);
         bundle.putString(MusicDetailsActivity.SONG_URL,songUrl);
-        bundle.putInt(MusicDetailsActivity.LIST_INDEX,index);
         intent.putExtras(bundle);
         return intent;
     }

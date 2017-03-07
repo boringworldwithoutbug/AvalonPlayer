@@ -18,7 +18,8 @@ public class MediaPlayerUtils {
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    mediaPlayer.release();
+//                    mediaPlayer.release();
+
                 }
             });
         }
@@ -48,8 +49,17 @@ public class MediaPlayerUtils {
         getPlayer().start();
     }
 
-    public void seekTo(int position) {
-
+    public void seekTo(int position,String url) {
+        try {
+            getPlayer().stop();
+            getPlayer().reset();
+            getPlayer().setDataSource(url);
+            getPlayer().prepare();
+            getPlayer().seekTo(position);
+            getPlayer().start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getCurrentPosition(){

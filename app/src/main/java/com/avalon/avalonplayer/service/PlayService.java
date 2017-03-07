@@ -17,15 +17,10 @@ import android.widget.RemoteViews;
 import com.avalon.avalonplayer.R;
 import com.avalon.avalonplayer.application.AvalonApplication;
 import com.avalon.avalonplayer.data.MusicItemData;
-import com.avalon.avalonplayer.db.MusicInfo;
 import com.avalon.avalonplayer.ui.activity.MusicDetailsActivity;
 import com.avalon.avalonplayer.utils.MediaPlayerUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by wuqiuqiang on 2017/2/6.
@@ -61,6 +56,7 @@ public class PlayService extends Service {
         filter.addAction(MusicDetailsActivity.LAST);
         filter.addAction(MusicDetailsActivity.SEEK);
         filter.addAction("cancel");
+        filter.addAction("notify_play");
         registerReceiver(playBroadcast, filter);
     }
 
@@ -82,6 +78,7 @@ public class PlayService extends Service {
     public void onDestroy() {
         super.onDestroy();
         utils.destroy();
+        manager.cancel(1);
         unregisterReceiver(playBroadcast);
     }
 
@@ -114,6 +111,10 @@ public class PlayService extends Service {
                     intentCancel, 0);
             contentView.setOnClickPendingIntent(R.id.tv_notify_close, pIntentCancel);
 
+            Intent intentNotifyPlay = new Intent("notify_play");
+            PendingIntent pIntent  = PendingIntent.getBroadcast(this, 0, intentNotifyPlay, 0);
+            contentView.setOnClickPendingIntent(R.id.tv_notify_play, pIntent);
+
             builder.setCustomContentView(contentView);
             manager.notify(1, builder.build());
         }
@@ -124,11 +125,11 @@ public class PlayService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            currentIndex = AvalonApplication.getInstance().getCurrentPlayIndex();
+            url = currentList.get(currentIndex).getUrl();
             switch (action) {
                 case MusicDetailsActivity.PLAY:
                     initNotification();
-                    currentIndex = intent.getExtras().getInt(MusicDetailsActivity.LIST_INDEX, 0);
-                    url = currentList.get(currentIndex).getUrl();
                     AvalonApplication.getInstance().setPlayState(0);
                     if (!TextUtils.isEmpty(url))
                         utils.play(url);
@@ -147,15 +148,11 @@ public class PlayService extends Service {
                     break;
                 case MusicDetailsActivity.NEXT:
                     AvalonApplication.getInstance().setPlayState(0);
-                    currentIndex = intent.getExtras().getInt(MusicDetailsActivity.LIST_INDEX, 0);
-                    url = currentList.get(currentIndex).getUrl();
                     if (!TextUtils.isEmpty(url))
                         utils.play(url);
                     break;
                 case MusicDetailsActivity.LAST:
                     AvalonApplication.getInstance().setPlayState(0);
-                    currentIndex = intent.getExtras().getInt(MusicDetailsActivity.LIST_INDEX, 0);
-                    url = currentList.get(currentIndex).getUrl();
                     if (!TextUtils.isEmpty(url))
                         utils.play(url);
                     break;
@@ -163,10 +160,26 @@ public class PlayService extends Service {
                     AvalonApplication.getInstance().setPlayState(-1);
                     utils.destroy();
                     manager.cancel(1);
+                    builder = null;
                     break;
                 case MusicDetailsActivity.SEEK:
                     position = intent.getExtras().getInt(MusicDetailsActivity.SEEK_POSITION, 0);
-                    utils.seekTo(position);
+                    AvalonApplication.getInstance().setCurrentProgress(position);
+                    utils.seekTo(position, url);
+                    break;
+                case "notify_play" :
+                    int state = AvalonApplication.getInstance().getPlayState();
+                    if (state == 1) {
+                        AvalonApplication.getInstance().setPlayState(0);
+                        utils.reset();
+                    } else if (state == -1) {
+                        AvalonApplication.getInstance().setPlayState(0);
+                        if (!TextUtils.isEmpty(url))
+                            utils.play(url);
+                    } else {
+                        AvalonApplication.getInstance().setPlayState(1);
+                        utils.pause();
+                    }
                     break;
             }
         }

@@ -32,6 +32,8 @@ public class AvalonApplication extends Application {
     public List<MusicItemData> currentPlayList;
     public int currentPlayIndex = 0;
 
+    public int currentProgress = 0;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -87,6 +89,14 @@ public class AvalonApplication extends Application {
 
     public void setCurrentPlayIndex(int currentPlayIndex) {
         this.currentPlayIndex = currentPlayIndex;
+    }
+
+    public int getCurrentProgress() {
+        return currentProgress;
+    }
+
+    public void setCurrentProgress(int currentProgress) {
+        this.currentProgress = currentProgress;
     }
 }
 

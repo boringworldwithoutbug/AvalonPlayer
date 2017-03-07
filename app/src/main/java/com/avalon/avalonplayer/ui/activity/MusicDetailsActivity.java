@@ -33,7 +33,6 @@ public class MusicDetailsActivity extends BaseActivity {
     public final static String SONG_NAME = "songName";
     public final static String SINGEL_NAME = "singerName";
     public final static String SONG_URL = "songUrl";
-    public final static String LIST_INDEX = "listIndex";
     public final static String SEEK_POSITION = "seekPosition";
 
     public final static String PLAY = "com.avalon.avalonplayer.PLAY";
@@ -52,6 +51,7 @@ public class MusicDetailsActivity extends BaseActivity {
         setTitle(songName);
         mBinding.setData(new MusicDetailData());
         mBinding.setClick(new MusicDetailsOnClick());
+        setSeekListener();
     }
 
     @Override
@@ -59,22 +59,8 @@ public class MusicDetailsActivity extends BaseActivity {
         super.onResume();
         if (AvalonApplication.getInstance().getPlayState() != -1) {
             bindService();
-            mBinding.sbMusicProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    seekTo(progress);
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
+        } else {
+            mBinding.sbMusicProgress.setEnabled(false);
         }
     }
 
@@ -82,13 +68,30 @@ public class MusicDetailsActivity extends BaseActivity {
         songName = getIntent().getExtras().getString(SONG_NAME, "");
         singerName = getIntent().getExtras().getString(SINGEL_NAME, "");
         songUrl = getIntent().getExtras().getString(SONG_URL, "");
-        index = getIntent().getExtras().getInt(LIST_INDEX, 0);
+        index = AvalonApplication.getInstance().getCurrentPlayIndex();
+    }
+
+    private void setSeekListener() {
+        mBinding.sbMusicProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                seekTo(seekBar.getProgress());
+            }
+        });
     }
 
     private void play() {
         Intent intent = new Intent();
         intent.setAction(PLAY);
-        intent.putExtra(LIST_INDEX, index);
         sendBroadcast(intent);
         bindService();
     }
@@ -116,7 +119,6 @@ public class MusicDetailsActivity extends BaseActivity {
         index = index < AvalonApplication.getInstance().getCurrentPlayList().size() - 1 ? index + 1 : 0;
         AvalonApplication.getInstance().setCurrentPlayIndex(index);
         intent.setAction(NEXT);
-        intent.putExtra(LIST_INDEX, index);
         sendBroadcast(intent);
     }
 
@@ -125,7 +127,6 @@ public class MusicDetailsActivity extends BaseActivity {
         index = index > 0 ? index - 1 : AvalonApplication.getInstance().getCurrentPlayList().size() - 1;
         AvalonApplication.getInstance().setCurrentPlayIndex(index);
         intent.setAction(LAST);
-        intent.putExtra(LIST_INDEX, index);
         sendBroadcast(intent);
     }
 
@@ -148,6 +149,7 @@ public class MusicDetailsActivity extends BaseActivity {
                         @Override
                         public void run() {
                             while (binder.getPlayerState()) {
+                                AvalonApplication.getInstance().setCurrentProgress(binder.getCurrentPosition());
                                 mBinding.sbMusicProgress.setProgress(binder.getCurrentPosition());
                                 try {
                                     Thread.sleep(500);
@@ -176,12 +178,14 @@ public class MusicDetailsActivity extends BaseActivity {
                 reset();
             } else if (state == -1) {
                 play();
+                mBinding.sbMusicProgress.setEnabled(true);
             } else {
                 pause();
             }
         }
 
         public void stop() {
+            mBinding.sbMusicProgress.setEnabled(false);
             stopMusic();
         }
 

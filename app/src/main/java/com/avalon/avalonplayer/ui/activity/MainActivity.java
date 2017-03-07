@@ -103,6 +103,7 @@ public class MainActivity extends BaseActivity {
         public void onPlaylIST() {
             AvalonApplication.getInstance().setCurrentPlayIndex(0);
             AvalonApplication.getInstance().setCurrentPlayList(mList);
+            showToast("add play list success");
         }
     }
 

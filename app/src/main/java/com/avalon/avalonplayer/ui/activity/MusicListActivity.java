@@ -18,14 +18,11 @@ import com.avalon.avalonplayer.application.AvalonApplication;
 import com.avalon.avalonplayer.callback.RecyclerViewItemOnClickListener;
 import com.avalon.avalonplayer.data.MusicItemData;
 import com.avalon.avalonplayer.databinding.ActivityMusiclistBinding;
-import com.avalon.avalonplayer.db.MusicInfo;
 import com.avalon.avalonplayer.service.PlayService;
 import com.avalon.avalonplayer.utils.GuideUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.realm.RealmResults;
 
 /**
  * Created by wuqiuqiang on 2017/2/6.
@@ -56,7 +53,8 @@ public class MusicListActivity extends BaseActivity {
         public void onClick(int position) {
             showToast(musicItemDatas.get(position).getUrl());
             MusicItemData data = musicItemDatas.get(position);
-            startActivity(GuideUtils.getMusicDetailsActivity(MusicListActivity.this, data.getSong(), data.getSinger(), data.getUrl(), position));
+            AvalonApplication.getInstance().setCurrentPlayIndex(position);
+            startActivity(GuideUtils.getMusicDetailsActivity(MusicListActivity.this, data.getSong(), data.getSinger(), data.getUrl()));
         }
     };
 

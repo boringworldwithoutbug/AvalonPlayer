@@ -19,6 +19,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="30dp"
         android:layout_marginStart="30dp"
+        android:padding="10dp"
         android:layout_toEndOf="@id/img_notify_icon"
         android:layout_toRightOf="@id/img_notify_icon"
         android:text="@string/play_music"
